@@ -332,7 +332,7 @@
   color: #7d8590;
   font-size: 11px;
   margin-right: 12px;
-  min-width: 60px;
+  min-width: 140px;
   font-weight: 500;
 }
 
@@ -560,7 +560,7 @@
   }
   
   .log-timestamp {
-    min-width: 50px;
+    min-width: 120px;
     font-size: 10px;
   }
   
@@ -578,6 +578,29 @@
     const element = document.getElementById(component);
     element.scrollTop = element.scrollHeight;
   }
+
+// Format timestamp consistently for display with date and time
+function formatTimestampForDisplay(timestamp) {
+  try {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) {
+      // If invalid date, return current datetime formatted
+      return new Date().toLocaleString();
+    }
+    // Format as "MM/DD/YYYY HH:MM:SS"
+    return date.toLocaleString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+  } catch (e) {
+    return new Date().toLocaleString();
+  }
+}
 let selectedLogLine = null;
 
 function parseLogLine(rawLog) {
@@ -789,9 +812,13 @@ async function loadFullLogsOnStartup(isInitialLoad = true) {
     // Always render database logs (even if empty) - NO SERVER FALLBACK
     logContainer.innerHTML = '';
     if (data.success && data.logs.length > 0) {
-      data.logs.reverse().forEach((log, index) => {
+      // Sort logs by timestamp to ensure chronological order (newest first from database)
+      const sortedLogs = data.logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      // Then reverse to show oldest first in UI (chronological display)
+      sortedLogs.reverse().forEach((log, index) => {
         const logData = {
-          timestamp: log.timestamp,
+          timestamp: formatTimestampForDisplay(log.timestamp),
           level: log.level,
           message: log.message,
           jsonData: log.jsonData,
@@ -810,7 +837,7 @@ async function loadFullLogsOnStartup(isInitialLoad = true) {
         }
       }, 0);
       
-      console.log(`✅ Loaded ${data.logs.length} logs from database`);
+      console.log(`✅ Loaded ${data.logs.length} logs from database (latest: ${data.logs[0]?.timestamp})`);
     } else {
       logContainer.innerHTML = '<div class="text-center p-4 text-muted">No logs found in database (new logs will appear here)</div>';
       console.log('📝 No logs in database');
@@ -867,6 +894,7 @@ socket.on("log", (payload) => {
     completeLines.forEach(logLine => {
       const logData = parseLogLine(logLine);
       logData.raw = logLine; // Preserve any ANSI colors for real-time logs
+      logData.timestamp = formatTimestampForDisplay(new Date()); // Use current time for real-time logs
       const logElement = createLogLineElement(logData, container.children.length, 'stdout');
       container.appendChild(logElement);
     });
@@ -885,6 +913,7 @@ socket.on("log", (payload) => {
           if (isCompleteLogLine(socketLogBuffer)) {
             const logData = parseLogLine(socketLogBuffer);
             logData.raw = socketLogBuffer;
+            logData.timestamp = formatTimestampForDisplay(new Date()); // Use current time for real-time logs
             const logElement = createLogLineElement(logData, container.children.length, 'stdout');
             container.appendChild(logElement);
             
@@ -1371,7 +1400,14 @@ function isCompleteLogLine(line) {
       let lastTimestamp = null;
       
       if (lastLogElement && lastLogElement.querySelector('.log-timestamp')) {
-        lastTimestamp = lastLogElement.querySelector('.log-timestamp').textContent;
+        const displayTime = lastLogElement.querySelector('.log-timestamp').textContent;
+        // Parse the formatted timestamp "MM/DD/YYYY HH:MM:SS"
+        try {
+          lastTimestamp = new Date(displayTime);
+        } catch (e) {
+          console.warn('Could not parse last timestamp:', displayTime);
+          lastTimestamp = null;
+        }
       }
       
       // Fetch only recent logs
@@ -1382,16 +1418,21 @@ function isCompleteLogLine(line) {
         // Check if user was at bottom before adding new logs
         const wasAtBottom = Math.abs(logContainer.scrollTop - (logContainer.scrollHeight - logContainer.clientHeight)) < 50;
         
-        // Filter out logs that are already displayed
+        // Filter out logs that are already displayed (compare actual timestamps)
         const newLogs = data.logs.filter(log => {
-          return !lastTimestamp || log.timestamp > lastTimestamp;
+          if (!lastTimestamp) return true;
+          const logTime = new Date(log.timestamp);
+          return logTime > lastTimestamp;
         });
         
         if (newLogs.length > 0) {
-          // Add only new logs
-          newLogs.reverse().forEach((log, index) => {
+          // Sort new logs chronologically (oldest first for display)
+          const sortedNewLogs = newLogs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+          
+          // Add only new logs in chronological order
+          sortedNewLogs.forEach((log, index) => {
             const logData = {
-              timestamp: log.timestamp,
+              timestamp: formatTimestampForDisplay(log.timestamp),
               level: log.level,
               message: log.message,
               jsonData: log.jsonData,
@@ -1406,7 +1447,8 @@ function isCompleteLogLine(line) {
             logContainer.scrollTop = logContainer.scrollHeight;
           }
           
-          console.log(`✅ Added ${newLogs.length} new logs seamlessly`);
+          const latestLog = sortedNewLogs[sortedNewLogs.length - 1];
+          console.log(`✅ Added ${newLogs.length} new logs seamlessly (latest: ${latestLog.timestamp})`);
         }
       }
     } catch (error) {
