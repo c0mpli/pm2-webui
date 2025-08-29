@@ -144,46 +144,134 @@
       </div>
       <div class="col-md-9 mb-4">
         <div class="card">
-          <ul class="nav nav-tabs" data-bs-toggle="tabs">
-            <li class="nav-item">
-              <a href="#stdout" class="nav-link active" data-bs-toggle="tab"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-thumb-up" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-terminal" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <polyline points="4,17 10,11 4,5"></polyline>
+                <line x1="12" y1="19" x2="20" y2="19"></line>
+              </svg>
+              <span class="ms-2 fw-bold">Application Logs</span>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-icon btn-sm" onclick="downloadLogs()" title="Download Logs (6 hours)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-download" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path d="M7 11v8a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1h3a4 4 0 0 0 4 -4v-1a2 2 0 0 1 4 0v5h3a2 2 0 0 1 2 2l-1 5a2 3 0 0 1 -2 2h-7a3 3 0 0 1 -3 -3"></path>
-               </svg>
-                STDOUT</a>
-            </li>
-            <li class="nav-item">
-              <a href="#stderr" class="nav-link" data-bs-toggle="tab"><!-- Download SVG icon from http://tabler-icons.io/i/user -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-thumb-down" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+                  <polyline points="7,11 12,16 17,11"></polyline>
+                  <line x1="12" y1="4" x2="12" y2="16"></line>
+                </svg>
+              </button>
+              <button class="btn btn-icon btn-sm" onclick="toggleSearchPanel()" id="search-toggle-btn" title="Search Logs">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path d="M7 13v-8a1 1 0 0 0 -1 -1h-2a1 1 0 0 0 -1 1v7a1 1 0 0 0 1 1h3a4 4 0 0 1 4 4v1a2 2 0 0 0 4 0v-5h3a2 2 0 0 0 2 -2l-1 -5a2 3 0 0 0 -2 -2h-7a3 3 0 0 0 -3 3"></path>
-               </svg>
-                STDERR</a>
-            </li>
-            <li class="nav-item ms-auto">
-              <button class="btn btn-icon shadow-none" style="border:none !important;" onclick="nextLogs()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-big-top" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="10" cy="10" r="7"></circle>
+                  <line x1="21" y1="21" x2="15" y2="15"></line>
+                </svg>
+              </button>
+              <button class="btn btn-icon btn-sm" onclick="nextLogs()" title="Load Older Logs">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-big-top" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                   <path d="M9 20v-8h-3.586a1 1 0 0 1 -.707 -1.707l6.586 -6.586a1 1 0 0 1 1.414 0l6.586 6.586a1 1 0 0 1 -.707 1.707h-3.586v8a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path>
                </svg>
               </button>
-              <button class="btn btn-icon shadow-none" style="border:none !important;" onclick="refreshLogs()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <button class="btn btn-icon btn-sm" onclick="toggleAutoRefresh()" id="auto-refresh-btn" title="Auto-refresh ON (5s)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                   <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
                   <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
                </svg>
               </button>
-            </li>
-          </ul>
-          <div class="card-body">
-            <div class="tab-content">
-              <div class="tab-pane active" id="stdout" data-next-key="<%= logs.stdout.nextKey %>">
-                <code id="log-out" class="bg-dark" style="display:block; overflow-y:scroll; max-height:50vh !important; max-height:75vh !important; min-width:100%;"><%- logs.stdout.lines %></code>
+              <button class="btn btn-icon btn-sm" onclick="manualRefresh()" title="Manual Refresh">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh-dot" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+                  <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                  <circle cx="12" cy="12" r="1"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <!-- Search Panel -->
+          <div id="search-panel" class="search-panel" style="display: none;">
+            <div class="search-header">
+              <h5>Search & Filter Logs</h5>
+              <button class="btn-close" onclick="toggleSearchPanel()"></button>
+            </div>
+            <div class="search-body">
+              <div class="row">
+                <div class="col-md-10">
+                  <input type="text" id="search-input" class="form-control" placeholder="Search logs (filters current view + searches database)..." />
+                </div>
+                <div class="col-md-2">
+                  <button class="btn btn-primary" onclick="performComprehensiveSearch()">Search</button>
+                </div>
               </div>
-              <div class="tab-pane" id="stderr" data-next-key="<%= logs.stderr.nextKey %>">
-                <code id="log-err" class="bg-dark" style="display:block; overflow-y:scroll; max-height:50vh !important; max-height:75vh !important; min-width:100%;"><%- logs.stderr.lines %></code>
+              <div class="row mt-2">
+                <div class="col-12">
+                  <small class="text-muted">
+                    <span id="filter-stats">Showing all logs</span> | 
+                    <a href="#" onclick="clearFilter()" class="text-decoration-none">Clear</a> |
+                    <a href="#" onclick="toggleSearchMode()" class="text-decoration-none" id="search-mode-toggle">Database Search Mode</a>
+                  </small>
+                </div>
+              </div>
+              <div id="search-results" class="search-results mt-3" style="display: none;"></div>
+            </div>
+          </div>
+
+          <div class="card-body p-0" style="position: relative;">
+            <div id="log-out" class="log-container" style="max-height: 75vh; overflow-y: auto; padding: 0;"></div>
+            
+            <!-- Right-side drawer -->
+            <div id="log-drawer" class="log-drawer" style="display: none;">
+              <div class="drawer-header">
+                <div class="drawer-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-info-circle" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    <polyline points="11,12 12,12 12,16 13,16"></polyline>
+                  </svg>
+                  Log Details
+                </div>
+                <button class="drawer-close" onclick="closeLogDrawer()">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              <div class="drawer-content">
+                <div class="log-detail-section">
+                  <label class="drawer-label">Timestamp</label>
+                  <div id="drawer-timestamp" class="drawer-value">--</div>
+                </div>
+                <div class="log-detail-section">
+                  <label class="drawer-label">Level</label>
+                  <div id="drawer-level" class="drawer-value">--</div>
+                </div>
+                <div class="log-detail-section">
+                  <label class="drawer-label">Source</label>
+                  <div id="drawer-source" class="drawer-value">--</div>
+                </div>
+                <div class="log-detail-section">
+                  <label class="drawer-label">Process ID</label>
+                  <div id="drawer-pid" class="drawer-value"><%= app.pm_id %></div>
+                </div>
+                <div class="log-detail-section">
+                  <label class="drawer-label">Action</label>
+                  <div id="drawer-message" class="drawer-message">--</div>
+                </div>
+                <div class="log-detail-section" id="json-data-section" style="display: none;">
+                  <label class="drawer-label">Data</label>
+                  <div id="drawer-json-data" class="drawer-raw">--</div>
+                </div>
+                <div class="log-detail-section">
+                  <label class="drawer-label">Raw Log</label>
+                  <div id="drawer-raw" class="drawer-raw">--</div>
+                </div>
               </div>
             </div>
           </div>
@@ -211,6 +299,278 @@
   </div>
 </div>
 
+<style>
+.log-container {
+  background: #0d1117;
+  color: #c9d1d9;
+  font-family: 'SFMono-Regular', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.45;
+  border-radius: 6px;
+}
+
+.log-line {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 16px;
+  border-bottom: 1px solid #21262d;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.log-line:hover {
+  background-color: #161b22;
+}
+
+.log-line.selected {
+  background-color: #1f2937;
+  border-left: 3px solid #3b82f6;
+}
+
+.log-timestamp {
+  color: #7d8590;
+  font-size: 11px;
+  margin-right: 12px;
+  min-width: 60px;
+  font-weight: 500;
+}
+
+.log-level {
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-right: 8px;
+  min-width: 50px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.log-level.info {
+  background-color: #1e40af;
+  color: #dbeafe;
+}
+
+.log-level.error {
+  background-color: #dc2626;
+  color: #fee2e2;
+}
+
+.log-level.warn {
+  background-color: #d97706;
+  color: #fed7aa;
+}
+
+.log-level.debug {
+  background-color: #6b7280;
+  color: #f3f4f6;
+}
+
+.log-content {
+  flex: 1;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.log-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100%;
+  background: #ffffff;
+  border-left: 1px solid #e5e7eb;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.log-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.drawer-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: #6b7280;
+  transition: all 0.15s ease;
+}
+
+.drawer-close:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.log-detail-section {
+  margin-bottom: 20px;
+}
+
+.drawer-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.drawer-value {
+  font-size: 14px;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.drawer-message {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+  font-family: 'SFMono-Regular', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #374151;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.drawer-raw {
+  background: #0d1117;
+  color: #c9d1d9;
+  border-radius: 6px;
+  padding: 12px;
+  font-family: 'SFMono-Regular', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: auto;
+}
+
+/* Search Panel Styles */
+.search-panel {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 16px 20px;
+  margin: 0;
+}
+
+.search-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.search-header h5 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.search-results {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.search-result-item:hover {
+  background-color: #f8fafc;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-timestamp {
+  color: #6b7280;
+  font-size: 11px;
+  margin-right: 12px;
+  min-width: 120px;
+  font-family: 'SFMono-Regular', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
+}
+
+.search-result-content {
+  flex: 1;
+  font-family: 'SFMono-Regular', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.search-no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+}
+
+.search-results-header {
+  padding: 8px 12px;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .log-drawer {
+    width: 100%;
+  }
+  
+  .log-line {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .log-timestamp {
+    min-width: 50px;
+    font-size: 10px;
+  }
+  
+  .search-panel .row .col-md-8,
+  .search-panel .row .col-md-2 {
+    margin-bottom: 8px;
+  }
+}
+</style>
+
 <script src="/assets/js/prism.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -218,19 +578,365 @@
     const element = document.getElementById(component);
     element.scrollTop = element.scrollHeight;
   }
+let selectedLogLine = null;
+
+function parseLogLine(rawLog) {
+  // Remove HTML tags for parsing
+  const cleanLog = rawLog.replace(/<[^>]*>/g, '').trim();
+  
+  // Default values
+  let timestamp = new Date().toLocaleTimeString();
+  let level = 'info';
+  let message = cleanLog;
+  let jsonData = null;
+  
+  // Try to parse structured log format: [TIMESTAMP] LEVEL :: ACTION | JSON_DATA
+  const structuredLogMatch = cleanLog.match(/^\[([^\]]+)\]\s*(\w+)\s*::\s*([^|]+)(?:\s*\|\s*(.+))?$/);
+  
+  if (structuredLogMatch) {
+    timestamp = structuredLogMatch[1];
+    level = structuredLogMatch[2].toLowerCase();
+    message = structuredLogMatch[3].trim();
+    
+    // Try to parse JSON data if present
+    if (structuredLogMatch[4]) {
+      try {
+        jsonData = JSON.parse(structuredLogMatch[4]);
+      } catch (e) {
+        // If JSON parsing fails, keep as string
+        jsonData = structuredLogMatch[4];
+      }
+    }
+  } else {
+    // Fallback: try to extract log level from common patterns
+    const levelPatterns = {
+      error: /\b(error|err|exception|fail|fatal)\b/i,
+      warn: /\b(warn|warning|caution)\b/i,
+      debug: /\b(debug|trace|verbose)\b/i,
+      info: /\b(info|information|log)\b/i
+    };
+    
+    for (const [levelName, pattern] of Object.entries(levelPatterns)) {
+      if (pattern.test(cleanLog)) {
+        level = levelName;
+        break;
+      }
+    }
+    
+    // Try to extract timestamp from log if present
+    const timestampMatch = cleanLog.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}|\d{2}:\d{2}:\d{2}|\[\d{2}:\d{2}:\d{2}\]/);
+    if (timestampMatch) {
+      timestamp = timestampMatch[0].replace(/[\[\]]/g, '');
+    }
+  }
+  
+  return {
+    timestamp,
+    level,
+    message,
+    jsonData,
+    raw: rawLog
+  };
+}
+
+function extractColoredActionName(rawLog, actionName) {
+  if (!rawLog || !rawLog.includes('<')) {
+    return actionName; // No colors to preserve
+  }
+  
+  // Create a temporary element to properly parse HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = rawLog;
+  
+  // Find text nodes that contain the action name
+  function findColoredText(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      if (node.textContent.includes(actionName)) {
+        // Return the parent with its styling
+        return node.parentNode;
+      }
+    } else {
+      for (let child of node.childNodes) {
+        const result = findColoredText(child);
+        if (result) return result;
+      }
+    }
+    return null;
+  }
+  
+  const coloredElement = findColoredText(tempDiv);
+  if (coloredElement && coloredElement !== tempDiv) {
+    // Extract just the action name part with its colors
+    const coloredText = coloredElement.textContent;
+    if (coloredText.includes(actionName)) {
+      const clone = coloredElement.cloneNode(true);
+      clone.textContent = actionName;
+      return clone.outerHTML;
+    }
+  }
+  
+  return actionName;
+}
+
+function createLogLineElement(logData, index, logType) {
+  const logLine = document.createElement('div');
+  logLine.className = 'log-line';
+  logLine.dataset.index = index;
+  logLine.dataset.logType = logType;
+  
+  // Extract just the action name with preserved colors
+  const displayContent = extractColoredActionName(logData.raw, logData.message);
+  
+  logLine.innerHTML = `
+    <span class="log-timestamp">${logData.timestamp}</span>
+    <span class="log-level ${logData.level}">${logData.level}</span>
+    <span class="log-content">${displayContent}</span>
+  `;
+  
+  logLine.addEventListener('click', () => openLogDrawer(logData, logLine));
+  return logLine;
+}
+
+function renderLogs(logType, logsHtml) {
+  const container = document.getElementById(logType === 'stdout' ? 'log-out' : 'log-err');
+  container.innerHTML = '';
+  
+  if (!logsHtml) return;
+  
+  // Split by <br> and also by actual newlines, then filter empty lines
+  let logLines = logsHtml.split(/<br\s*\/?>/i);
+  
+  // Further split by actual newlines in case they exist
+  logLines = logLines.flatMap(line => line.split(/\r?\n/));
+  
+  // Filter out empty lines and lines with only whitespace
+  logLines = logLines.filter(line => line.trim() && line.trim() !== '');
+  
+  logLines.forEach((rawLog, index) => {
+    const logData = parseLogLine(rawLog);
+    logData.raw = rawLog; // Keep the original colored HTML
+    const logElement = createLogLineElement(logData, index, logType);
+    container.appendChild(logElement);
+  });
+}
+
+function openLogDrawer(logData, logElement) {
+  // Remove previous selection
+  if (selectedLogLine) {
+    selectedLogLine.classList.remove('selected');
+  }
+  
+  // Select current line
+  selectedLogLine = logElement;
+  logElement.classList.add('selected');
+  
+  // Populate drawer
+  document.getElementById('drawer-timestamp').textContent = logData.timestamp;
+  document.getElementById('drawer-level').textContent = logData.level.toUpperCase();
+  document.getElementById('drawer-level').className = 'drawer-value log-level ' + logData.level;
+  document.getElementById('drawer-source').textContent = logElement.dataset.logType.toUpperCase();
+  document.getElementById('drawer-message').textContent = logData.message;
+  document.getElementById('drawer-raw').innerHTML = logData.raw;
+  
+  // Handle JSON data if present
+  const jsonDataSection = document.getElementById('json-data-section');
+  if (logData.jsonData) {
+    jsonDataSection.style.display = 'block';
+    document.getElementById('drawer-json-data').textContent = typeof logData.jsonData === 'object' 
+      ? JSON.stringify(logData.jsonData, null, 2) 
+      : logData.jsonData;
+  } else {
+    jsonDataSection.style.display = 'none';
+  }
+  
+  // Show drawer
+  const drawer = document.getElementById('log-drawer');
+  drawer.style.display = 'flex';
+  setTimeout(() => drawer.classList.add('open'), 10);
+}
+
+function closeLogDrawer() {
+  const drawer = document.getElementById('log-drawer');
+  drawer.classList.remove('open');
+  setTimeout(() => drawer.style.display = 'none', 300);
+  
+  if (selectedLogLine) {
+    selectedLogLine.classList.remove('selected');
+    selectedLogLine = null;
+  }
+}
+
+// Load ALL logs from database on startup - STDOUT ONLY
+async function loadFullLogsOnStartup(isInitialLoad = true) {
+  try {
+    console.log('🚀 Loading ALL STDOUT logs from database...');
+    
+    const logContainer = document.getElementById('log-out');
+    
+    // Only show loading indicator on initial load, not on refresh
+    if (isInitialLoad) {
+      logContainer.innerHTML = '<div class="text-center p-4 text-muted">Loading all logs from database...</div>';
+    }
+    
+    // Load stdout logs with high limit to get ALL logs
+    const response = await fetch('/api/apps/<%= app.name %>/logs/recent?logType=stdout&limit=5000'); // 30 minutes, smaller limit
+    const data = await response.json();
+
+    // Store current scroll position before clearing (for smooth refresh)
+    const scrollPosition = logContainer.scrollTop;
+    const wasAtBottom = Math.abs(logContainer.scrollTop - (logContainer.scrollHeight - logContainer.clientHeight)) < 50;
+    
+    // Always render database logs (even if empty) - NO SERVER FALLBACK
+    logContainer.innerHTML = '';
+    if (data.success && data.logs.length > 0) {
+      data.logs.reverse().forEach((log, index) => {
+        const logData = {
+          timestamp: log.timestamp,
+          level: log.level,
+          message: log.message,
+          jsonData: log.jsonData,
+          raw: log.raw
+        };
+        const logElement = createLogLineElement(logData, index, 'stdout');
+        logContainer.appendChild(logElement);
+      });
+      
+      // Restore scroll position or stay at bottom if user was at bottom
+      setTimeout(() => {
+        if (wasAtBottom || isInitialLoad) {
+          logContainer.scrollTop = logContainer.scrollHeight;
+        } else {
+          logContainer.scrollTop = scrollPosition;
+        }
+      }, 0);
+      
+      console.log(`✅ Loaded ${data.logs.length} logs from database`);
+    } else {
+      logContainer.innerHTML = '<div class="text-center p-4 text-muted">No logs found in database (new logs will appear here)</div>';
+      console.log('📝 No logs in database');
+    }
+
+    // Initialize filter stats
+    updateFilterStats(data.logs?.length || 0, data.logs?.length || 0);
+    
+  } catch (error) {
+    console.error('❌ Error loading logs from database:', error);
+    // Show error message - NO FALLBACK to server logs
+    document.getElementById('log-out').innerHTML = '<div class="text-center p-4 text-danger">Failed to load logs from database</div>';
+  }
+}
+
+function updateCurrentFilterStats() {
+  const container = document.getElementById('log-out');
+  const totalLogs = container.querySelectorAll('.log-line').length;
+  updateFilterStats(totalLogs, totalLogs);
+}
+
+// Initialize logs on page load with full data
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load all available logs on startup
+  await loadFullLogsOnStartup();
+  
+  // Start auto-refresh after initial load
+  startAutoRefresh();
+});
+
 const socket = io();
+let socketLogBuffer = ''; // Buffer to accumulate incomplete log data
+let bufferTimeout = null; // Timeout to flush incomplete buffer
+
 socket.on("log", (payload) => {
-  if("<%= app.pm_id %>" == payload.process.pm_id){
-    const _data = payload.data.replace(/(?:\r\n|\r|\n)/g, '<br>');
-    document.getElementById(payload.logType).innerHTML += _data;
-    scrollDown("log-out")
-    scrollDown("log-err")
+  if("<%= app.pm_id %>" == payload.process.pm_id && payload.logType === 'log-out'){
+    const container = document.getElementById('log-out');
+    
+    // Check if user was at bottom before adding new logs
+    const wasAtBottom = Math.abs(container.scrollTop - (container.scrollHeight - container.clientHeight)) < 50;
+    
+    // Accumulate data in buffer
+    socketLogBuffer += payload.data;
+    
+    // Split buffer by newlines to find complete log lines
+    const lines = socketLogBuffer.split(/\r?\n/);
+    
+    // Keep the last line in buffer (might be incomplete)
+    socketLogBuffer = lines.pop() || '';
+    
+    // Process only complete lines
+    const completeLines = lines.filter(line => line.trim() && isCompleteLogLine(line.trim()));
+    
+    completeLines.forEach(logLine => {
+      const logData = parseLogLine(logLine);
+      logData.raw = logLine; // Preserve any ANSI colors for real-time logs
+      const logElement = createLogLineElement(logData, container.children.length, 'stdout');
+      container.appendChild(logElement);
+    });
+    
+    // Only auto-scroll if user was already at the bottom and we added new lines
+    if (wasAtBottom && completeLines.length > 0) {
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    // Set timeout to flush incomplete buffer after 500ms of no new data
+    clearTimeout(bufferTimeout);
+    if (socketLogBuffer.trim()) {
+      bufferTimeout = setTimeout(() => {
+        if (socketLogBuffer.trim()) {
+          // Only flush buffer if it looks like a potentially complete log
+          if (isCompleteLogLine(socketLogBuffer)) {
+            const logData = parseLogLine(socketLogBuffer);
+            logData.raw = socketLogBuffer;
+            const logElement = createLogLineElement(logData, container.children.length, 'stdout');
+            container.appendChild(logElement);
+            
+            // Auto-scroll if user was at bottom
+            const currentlyAtBottom = Math.abs(container.scrollTop - (container.scrollHeight - container.clientHeight)) < 50;
+            if (currentlyAtBottom) {
+              container.scrollTop = container.scrollHeight;
+            }
+          } else {
+            // Discard incomplete fragments instead of displaying them
+            console.log('Discarding incomplete log fragment:', socketLogBuffer);
+          }
+          
+          socketLogBuffer = '';
+        }
+      }, 500);
+    }
   }
 })
-  function getActiveTabData(){
+
+// Helper function to determine if a line is a complete log entry
+function isCompleteLogLine(line) {
+  const cleanLine = line.replace(/<[^>]*>/g, '').trim();
+  
+  // Reject empty lines, just whitespace, or lines with only backslashes
+  if (!cleanLine || cleanLine === '\\' || /^\\+$/.test(cleanLine)) {
+    return false;
+  }
+  
+  // Reject single words or very short fragments
+  if (cleanLine.length < 15 || cleanLine.split(/\s+/).length < 2) {
+    return false;
+  }
+  
+  // Check if it's a structured log line with timestamp, level, and action
+  const structuredLogPattern = /^\[.+?\]\s+\w+\s+::\s+.+/;
+  if (structuredLogPattern.test(cleanLine)) {
+    return true;
+  }
+  
+  // For other formats, require timestamp, level, and substantial content
+  const hasTimestamp = /\d{4}-\d{2}-\d{2}|\d{2}:\d{2}:\d{2}/.test(cleanLine);
+  const hasLevel = /\b(info|error|warn|debug)\b/i.test(cleanLine);
+  const hasSubstantialContent = cleanLine.length > 25 && cleanLine.split(/\s+/).length >= 3;
+  
+  // All three must be present for a complete log
+  return hasTimestamp && hasLevel && hasSubstantialContent;
+}
+  function getCurrentLogData(){
     const data = {
-      log_type: $('.tab-pane.active').attr('id'),
-      next_key: $('.tab-pane.active').attr('data-next-key')
+      log_type: 'stdout',
+      next_key: document.getElementById('log-out').getAttribute('data-next-key') || '-1'
     };
     return data
   }
@@ -248,18 +954,33 @@ socket.on("log", (payload) => {
   function setLogsData(log_type, logs, action){
     $(`#${log_type}`).attr('data-next-key', logs.nextKey)
     if(action === 'refresh'){
-      $(`#${log_type} code`).html(logs.lines)
+      renderLogs(log_type, logs.lines);
     }
     else if(action === 'append'){
-      $(`#${log_type} code`).append('<br/>' + logs.lines)
+      // For real-time updates, split and add new lines
+      if (logs.lines) {
+        const container = document.getElementById(log_type === 'stdout' ? 'log-out' : 'log-err');
+        const newLogLines = logs.lines.split(/<br\s*\/?>/i)
+          .flatMap(line => line.split(/\r?\n/))
+          .filter(line => line.trim() && line.trim() !== '');
+        
+        newLogLines.forEach(rawLog => {
+          const logData = parseLogLine(rawLog);
+          logData.raw = rawLog; // Preserve ANSI colors
+          const logElement = createLogLineElement(logData, container.children.length, log_type);
+          container.appendChild(logElement);
+        });
+        container.scrollTop = container.scrollHeight;
+      }
     }
     else if(action === 'prepend'){
-      $(`#${log_type} code`).prepend(logs.lines + '<br/>')
+      // For loading older logs, we'll re-render for simplicity
+      renderLogs(log_type, logs.lines);
     }
   }
 
   async function refreshLogs(){
-    const { log_type } = getActiveTabData()
+    const { log_type } = getCurrentLogData()
     const logs  = await fetchLogs(log_type)
     if(logs){
       setLogsData(log_type, logs, 'refresh')
@@ -270,7 +991,7 @@ socket.on("log", (payload) => {
   }
 
   async function nextLogs(){
-    const { log_type, next_key  } = getActiveTabData()
+    const { log_type, next_key  } = getCurrentLogData()
     if(parseInt(next_key) < 0){
       console.log('End of Logs')
     }
@@ -284,4 +1005,502 @@ socket.on("log", (payload) => {
       }
     }
   }
+
+  // Global variables for filtering and search
+  let currentFilter = '';
+  let searchMode = 'filter'; // 'filter' or 'database'
+  let isSearchResultsMode = false;
+
+  // Search/Filter functionality
+  function toggleSearchPanel() {
+    const panel = document.getElementById('search-panel');
+    const isVisible = panel.style.display !== 'none';
+    panel.style.display = isVisible ? 'none' : 'block';
+    
+    if (!isVisible) {
+      document.getElementById('search-input').focus();
+    }
+  }
+
+  function toggleSearchMode() {
+    searchMode = searchMode === 'filter' ? 'database' : 'filter';
+    const toggle = document.getElementById('search-mode-toggle');
+    const searchResults = document.getElementById('search-results');
+    
+    if (searchMode === 'database') {
+      toggle.textContent = 'Filter Current Logs Mode';
+      searchResults.style.display = 'block';
+      document.getElementById('search-input').placeholder = 'Search in database (last 6 hours)...';
+    } else {
+      toggle.textContent = 'Database Search Mode';
+      searchResults.style.display = 'none';
+      document.getElementById('search-input').placeholder = 'Search logs (filters current view + searches database)...';
+      // Clear any search results
+      if (isSearchResultsMode) {
+        clearFilter();
+      }
+    }
+  }
+
+  async function performComprehensiveSearch() {
+    const query = document.getElementById('search-input').value.trim();
+    
+    if (!query) {
+      clearFilter();
+      return;
+    }
+
+    if (searchMode === 'database') {
+      await performDatabaseSearch(query);
+    } else {
+      // Comprehensive search: Filter current + show DB results
+      await performComprehensiveFilter(query);
+    }
+  }
+
+  async function performComprehensiveFilter(query) {
+    // First, filter current logs
+    currentFilter = query.toLowerCase();
+    applyFilter();
+    
+    try {
+      // Also search database and show additional results
+      const searchParams = new URLSearchParams({
+        q: query,
+        hours: '6',
+        limit: '100',
+        logType: 'stdout'
+      });
+
+      const response = await fetch(`/api/apps/<%= app.name %>/logs/search?${searchParams}`);
+      const data = await response.json();
+
+      const searchResults = document.getElementById('search-results');
+      
+      if (data.success && data.results.length > 0) {
+        // Show additional results from database that might not be in current view
+        const currentLogIds = new Set();
+        
+        // Get current visible log timestamps to avoid duplicates
+        const container = document.getElementById('log-out');
+        const visibleLogs = container.querySelectorAll('.log-line:not([style*="display: none"])');
+        
+        visibleLogs.forEach(log => {
+          const timestamp = log.querySelector('.log-timestamp').textContent;
+          currentLogIds.add(timestamp);
+        });
+
+        // Filter out results already visible in current view
+        const additionalResults = data.results.filter(result => 
+          !currentLogIds.has(result.timestamp)
+        );
+
+        if (additionalResults.length > 0) {
+          searchResults.style.display = 'block';
+          searchResults.innerHTML = `
+            <div class="search-results-header">
+              <small class="text-muted">Additional matches from database (${additionalResults.length} results not in current view):</small>
+            </div>
+            ${additionalResults.map(result => `
+              <div class="search-result-item" onclick="openLogDrawerFromSearch(${JSON.stringify(result).replace(/"/g, '&quot;')})">
+                <span class="search-result-timestamp">${result.timestamp}</span>
+                <span class="log-level ${result.level}">${result.level.toUpperCase()}</span>
+                <div class="search-result-content">${highlightSearchTerm(result.message || 'No message', query)}</div>
+              </div>
+            `).join('')}
+          `;
+        } else {
+          searchResults.style.display = 'none';
+        }
+      } else {
+        searchResults.style.display = 'none';
+      }
+    } catch (error) {
+      console.error('Database search error:', error);
+    }
+    
+    // Close search panel after filtering
+    document.getElementById('search-panel').style.display = 'none';
+  }
+
+  async function performDatabaseSearch(query) {
+    const resultsDiv = document.getElementById('search-results');
+    resultsDiv.innerHTML = '<div class="text-center p-3">Searching database...</div>';
+    resultsDiv.style.display = 'block';
+
+    try {
+      const searchParams = new URLSearchParams({
+        q: query,
+        hours: '6',
+        limit: '500',
+        logType: 'stdout'
+      });
+
+      const response = await fetch(`/api/apps/<%= app.name %>/logs/search?${searchParams}`);
+      const data = await response.json();
+
+      if (data.success && data.results.length > 0) {
+        displayDatabaseSearchResults(data.results, query);
+        isSearchResultsMode = true;
+      } else {
+        resultsDiv.innerHTML = '<div class="search-no-results">No results found in database for "' + query + '"</div>';
+      }
+    } catch (error) {
+      console.error('Database search error:', error);
+      resultsDiv.innerHTML = '<div class="search-no-results text-danger">Search failed. Please try again.</div>';
+    }
+  }
+
+  function displayDatabaseSearchResults(results, query) {
+    const resultsDiv = document.getElementById('search-results');
+    const resultsHtml = `
+      <div class="search-results-header mb-2">
+        <small class="text-muted">Database search results (${results.length} matches for "${query}"):</small>
+      </div>
+      ${results.map(result => `
+        <div class="search-result-item" onclick="openLogDrawerFromSearch(${JSON.stringify(result).replace(/"/g, '&quot;')})">
+          <span class="search-result-timestamp">${result.timestamp}</span>
+          <span class="log-level ${result.level}">${result.level.toUpperCase()}</span>
+          <div class="search-result-content">${highlightSearchTerm(result.message || 'No message', query)}</div>
+        </div>
+      `).join('')}
+    `;
+    
+    resultsDiv.innerHTML = resultsHtml;
+  }
+
+  function openLogDrawerFromSearch(logData) {
+    // Create a mock log element for the drawer
+    const mockElement = { dataset: { logType: logData.logType } };
+    
+    // Convert search result format to log data format
+    const drawerLogData = {
+      timestamp: logData.timestamp,
+      level: logData.level,
+      message: logData.message,
+      jsonData: logData.jsonData,
+      raw: logData.raw
+    };
+    
+    openLogDrawer(drawerLogData, mockElement);
+  }
+
+  function applyFilter() {
+    const container = document.getElementById('log-out');
+    
+    if (!currentFilter) {
+      // Show all logs
+      showAllLogs();
+      return;
+    }
+
+    // Filter logs
+    const logLines = container.querySelectorAll('.log-line');
+    let visibleCount = 0;
+    
+    logLines.forEach(logLine => {
+      const logContent = logLine.textContent.toLowerCase();
+      const logContentElement = logLine.querySelector('.log-content');
+      const originalContent = logContentElement.innerHTML;
+      
+      if (logContent.includes(currentFilter)) {
+        logLine.style.display = 'flex';
+        // Highlight the search term
+        const highlightedContent = highlightSearchTerm(originalContent, currentFilter);
+        logContentElement.innerHTML = highlightedContent;
+        visibleCount++;
+      } else {
+        logLine.style.display = 'none';
+      }
+    });
+
+    updateFilterStats(visibleCount, logLines.length);
+  }
+
+  function highlightSearchTerm(html, searchTerm) {
+    if (!searchTerm) return html;
+    
+    // Create a temporary element to work with the HTML content
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // Get the text content and perform highlighting
+    const textContent = tempDiv.textContent || tempDiv.innerText;
+    const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    
+    // If the text contains the search term, highlight it
+    if (regex.test(textContent)) {
+      const highlightedText = textContent.replace(regex, '<mark style="background-color: #fff59d; padding: 1px 2px; border-radius: 2px;">$1</mark>');
+      return highlightedText;
+    }
+    
+    return html;
+  }
+
+  function clearFilter() {
+    currentFilter = '';
+    isSearchResultsMode = false;
+    document.getElementById('search-input').value = '';
+    
+    // Hide search results
+    const searchResults = document.getElementById('search-results');
+    searchResults.style.display = 'none';
+    searchResults.innerHTML = '';
+    
+    // Show all logs and remove highlights
+    const container = document.getElementById('log-out');
+    const logLines = container.querySelectorAll('.log-line');
+    
+    logLines.forEach(logLine => {
+      logLine.style.display = 'flex';
+      const logContent = logLine.querySelector('.log-content');
+      // Remove highlight marks but preserve original HTML formatting
+      logContent.innerHTML = logContent.innerHTML.replace(/<mark[^>]*>(.*?)<\/mark>/gi, '$1');
+    });
+
+    const totalLogs = container.querySelectorAll('.log-line').length;
+    updateFilterStats(totalLogs, totalLogs);
+  }
+
+  function showAllLogs() {
+    const container = document.getElementById('log-out');
+    const logLines = container.querySelectorAll('.log-line');
+    
+    logLines.forEach(logLine => {
+      logLine.style.display = 'flex';
+    });
+    
+    updateFilterStats(logLines.length, logLines.length);
+  }
+
+  function updateFilterStats(visible, total) {
+    const statsElement = document.getElementById('filter-stats');
+    if (currentFilter) {
+      statsElement.textContent = `Showing ${visible} of ${total} logs (filtered by "${currentFilter}")`;
+    } else {
+      statsElement.textContent = `Showing all ${total} logs`;
+    }
+  }
+
+  // Download functionality
+  async function downloadLogs() {
+    try {
+      const response = await fetch(`/api/apps/<%= app.name %>/logs/recent?hours=0.5&limit=1000`); // 30 minutes
+      const data = await response.json();
+
+      if (data.success && data.logs.length > 0) {
+        const logText = data.logs.map(log => {
+          const jsonPart = log.jsonData ? ` | ${JSON.stringify(log.jsonData)}` : '';
+          return `[${log.timestamp}] ${log.level.toUpperCase()} :: ${log.message}${jsonPart}`;
+        }).join('\\n');
+
+        const blob = new Blob([logText], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `<%= app.name %>_logs_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert('No logs available for download');
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download logs. Please try again.');
+    }
+  }
+
+  // Load all available logs function
+  async function loadAllLogs() {
+    try {
+      const activeTab = document.querySelector('.tab-pane.active');
+      const logType = activeTab.id; // 'stdout' or 'stderr'
+      
+      // Show loading indicator
+      const container = document.getElementById(logType === 'stdout' ? 'log-out' : 'log-err');
+      const originalContent = container.innerHTML;
+      container.innerHTML = '<div class="text-center p-3">Loading all logs...</div>';
+      
+      const response = await fetch(`/api/apps/<%= app.name %>/logs/recent?logType=${logType}&hours=0.5&limit=5000`); // 30 minutes
+      const data = await response.json();
+
+      if (data.success && data.logs.length > 0) {
+        // Clear container and render all logs
+        container.innerHTML = '';
+        
+        data.logs.reverse().forEach((log, index) => {
+          const logData = {
+            timestamp: log.timestamp,
+            level: log.level,
+            message: log.message,
+            jsonData: log.jsonData,
+            raw: log.raw
+          };
+          const logElement = createLogLineElement(logData, index, logType);
+          container.appendChild(logElement);
+        });
+        
+        container.scrollTop = container.scrollHeight;
+        
+        // Update filter stats
+        updateFilterStats(data.logs.length, data.logs.length);
+        console.log(`Loaded ${data.logs.length} logs from storage`);
+      } else {
+        container.innerHTML = originalContent;
+        console.log('No stored logs found, keeping current view');
+      }
+    } catch (error) {
+      console.error('Error loading all logs:', error);
+      // Restore original content on error
+      const activeTab = document.querySelector('.tab-pane.active');
+      const logType = activeTab.id;
+      const container = document.getElementById(logType === 'stdout' ? 'log-out' : 'log-err');
+      container.innerHTML = originalContent;
+    }
+  }
+
+  // Seamless log refresh function that only adds new logs
+  async function seamlessLogRefresh() {
+    try {
+      const logContainer = document.getElementById('log-out');
+      
+      // Get the timestamp of the last log currently displayed
+      const lastLogElement = logContainer.lastElementChild;
+      let lastTimestamp = null;
+      
+      if (lastLogElement && lastLogElement.querySelector('.log-timestamp')) {
+        lastTimestamp = lastLogElement.querySelector('.log-timestamp').textContent;
+      }
+      
+      // Fetch only recent logs
+      const response = await fetch('/api/apps/<%= app.name %>/logs/recent?logType=stdout&limit=100');
+      const data = await response.json();
+      
+      if (data.success && data.logs.length > 0) {
+        // Check if user was at bottom before adding new logs
+        const wasAtBottom = Math.abs(logContainer.scrollTop - (logContainer.scrollHeight - logContainer.clientHeight)) < 50;
+        
+        // Filter out logs that are already displayed
+        const newLogs = data.logs.filter(log => {
+          return !lastTimestamp || log.timestamp > lastTimestamp;
+        });
+        
+        if (newLogs.length > 0) {
+          // Add only new logs
+          newLogs.reverse().forEach((log, index) => {
+            const logData = {
+              timestamp: log.timestamp,
+              level: log.level,
+              message: log.message,
+              jsonData: log.jsonData,
+              raw: log.raw
+            };
+            const logElement = createLogLineElement(logData, logContainer.children.length + index, 'stdout');
+            logContainer.appendChild(logElement);
+          });
+          
+          // Only auto-scroll if user was at the bottom
+          if (wasAtBottom) {
+            logContainer.scrollTop = logContainer.scrollHeight;
+          }
+          
+          console.log(`✅ Added ${newLogs.length} new logs seamlessly`);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error during seamless log refresh:', error);
+    }
+  }
+
+  // Auto-refresh logs every 5 seconds
+  let autoRefreshInterval;
+  
+  function startAutoRefresh() {
+    // Clear any existing interval
+    if (autoRefreshInterval) {
+      clearInterval(autoRefreshInterval);
+    }
+    
+    // Start new interval for automatic refresh every 5 seconds
+    autoRefreshInterval = setInterval(async () => {
+      console.log('🔄 Auto-refreshing logs (5s interval)...');
+      await seamlessLogRefresh(); // Use seamless refresh instead of full reload
+      
+      // Re-apply current filter if active
+      if (currentFilter) {
+        applyFilter();
+      }
+    }, 5000); // 5 seconds
+    
+    console.log('✅ Auto-refresh started (5s interval)');
+  }
+  
+  function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+      clearInterval(autoRefreshInterval);
+      autoRefreshInterval = null;
+      console.log('⏹️ Auto-refresh stopped');
+    }
+  }
+  
+  function toggleAutoRefresh() {
+    const btn = document.getElementById('auto-refresh-btn');
+    
+    if (autoRefreshInterval) {
+      stopAutoRefresh();
+      btn.title = 'Auto-refresh OFF (click to enable)';
+      btn.style.opacity = '0.5';
+    } else {
+      startAutoRefresh();
+      btn.title = 'Auto-refresh ON (5s)';
+      btn.style.opacity = '1';
+    }
+  }
+  
+  async function manualRefresh() {
+    console.log('🔄 Manual refresh triggered...');
+    await seamlessLogRefresh(); // Use seamless refresh instead of full reload
+    
+    // Re-apply current filter if active
+    if (currentFilter) {
+      applyFilter();
+    }
+    
+    // Visual feedback
+    const btn = document.querySelector('button[onclick="manualRefresh()"]');
+    btn.style.backgroundColor = '#e2e8f0';
+    setTimeout(() => {
+      btn.style.backgroundColor = '';
+    }, 200);
+  }
+
+  // Add keyboard shortcuts and enter key support for search
+  document.addEventListener('DOMContentLoaded', () => {
+    // Enter key for search
+    document.getElementById('search-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        performComprehensiveSearch();
+      }
+    });
+    
+    // Spacebar for refresh logs (like BetterStack)
+    document.addEventListener('keydown', (e) => {
+      // Only trigger if not typing in an input field
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && !e.target.isContentEditable) {
+        if (e.code === 'Space') {
+          e.preventDefault(); // Prevent page scroll
+          manualRefresh();
+        }
+      }
+    });
+    
+    // Initialize filter stats
+    setTimeout(() => {
+      const container = document.getElementById('log-out');
+      const totalLogs = container.querySelectorAll('.log-line').length;
+      updateFilterStats(totalLogs, totalLogs);
+    }, 500);
+  });
 </script>

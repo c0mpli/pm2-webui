@@ -13,6 +13,7 @@ const { Server } = require("socket.io");
 const pm2 = require("pm2");
 const AnsiConverter = require("ansi-to-html");
 const ansiConvert = new AnsiConverter();
+const logStorage = require("./services/log-storage.service");
 
 // Init Application
 
@@ -58,6 +59,50 @@ const _server = app.listen(config.PORT, config.HOST, () => {
   console.log(`Application started at http://${config.HOST}:${config.PORT}`);
 });
 
+// Helper function to store logs
+function parseLogData(rawData, coloredData) {
+  // Remove HTML tags for parsing
+  const cleanData = coloredData.replace(/<[^>]*>/g, '').trim();
+  
+  // Try to parse structured log format: [TIMESTAMP] LEVEL :: ACTION | JSON_DATA
+  const structuredLogMatch = cleanData.match(/^\[([^\]]+)\]\s*(\w+)\s*::\s*([^|]+)(?:\s*\|\s*(.+))?$/);
+  
+  if (structuredLogMatch) {
+    let jsonData = null;
+    if (structuredLogMatch[4]) {
+      try {
+        jsonData = JSON.parse(structuredLogMatch[4]);
+      } catch (e) {
+        jsonData = structuredLogMatch[4];
+      }
+    }
+    
+    return {
+      level: structuredLogMatch[2].toLowerCase(),
+      message: structuredLogMatch[3].trim(),
+      jsonData,
+      raw: coloredData
+    };
+  }
+  
+  // Fallback for unstructured logs
+  return {
+    level: 'info',
+    message: cleanData,
+    jsonData: null,
+    raw: coloredData
+  };
+}
+
+async function storeLogEntry(appName, logType, originalData, coloredData) {
+  try {
+    const logData = parseLogData(originalData, coloredData);
+    await logStorage.storeLog(appName, logType, logData);
+  } catch (error) {
+    console.error('Error storing log entry:', error);
+  }
+}
+
 const io = new Server(_server);
 io.on("connection", async (socket) => {
   pm2.launchBus((err, bus) => {
@@ -65,14 +110,24 @@ io.on("connection", async (socket) => {
       console.log(err);
     } else {
       bus.on("log:out", (log) => {
+        const originalData = log.data;
         log.data = ansiConvert.toHtml(log.data);
         log.logType = "log-out";
+        
+        // Store log with parsed data
+        storeLogEntry(log.process.name, "stdout", originalData, log.data);
+        
         socket.emit("log", log);
       });
 
       bus.on("log:err", (log) => {
+        const originalData = log.data;
         log.data = ansiConvert.toHtml(log.data);
         log.logType = "log-err";
+        
+        // Store log with parsed data
+        storeLogEntry(log.process.name, "stderr", originalData, log.data);
+        
         socket.emit("log", log);
       });
     }

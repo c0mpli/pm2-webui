@@ -10,6 +10,7 @@ const {
 } = require("../providers/pm2/api");
 const { validateAdminUser } = require("../services/admin.service");
 const { readLogsReverse } = require("../utils/read-logs.util");
+const logStorage = require("../services/log-storage.service");
 const {
   getCurrentGitBranch,
   getCurrentGitCommit,
@@ -92,27 +93,9 @@ router.get("/apps/:appName", isAuthenticated, async (ctx) => {
   return ctx.redirect("/apps");
 });
 
-router.get("/api/apps/:appName/logs/:logType", isAuthenticated, async (ctx) => {
-  const { appName, logType } = ctx.params;
-  const { linePerRequest, nextKey } = ctx.query;
-  if (logType !== "stdout" && logType !== "stderr") {
-    return (ctx.body = {
-      error: "Log Type must be stdout or stderr",
-    });
-  }
-  const app = await describeApp(appName);
-  const filePath =
-    logType === "stdout" ? app.pm_out_log_path : app.pm_err_log_path;
-  let logs = await readLogsReverse({ filePath, nextKey });
-  logs.lines = logs.lines
-    .map((log) => {
-      return ansiConvert.toHtml(log);
-    })
-    .join("<br/>");
-  return (ctx.body = {
-    logs,
-  });
-});
+// Legacy endpoint - moved after specific routes to avoid conflicts
+// This endpoint reads from log files directly (old system)
+// New endpoints use database storage system
 
 router.post("/api/apps/:appName/reload", isAuthenticated, async (ctx) => {
   try {
@@ -170,6 +153,168 @@ router.post("/api/apps/:appName/stop", isAuthenticated, async (ctx) => {
       error: err,
     });
   }
+});
+
+// Search logs endpoint
+router.get("/api/apps/:appName/logs/search", isAuthenticated, async (ctx) => {
+  try {
+    const { appName } = ctx.params;
+    const { q: query, logType, hours = 0.5, limit = 100 } = ctx.query; // 30 minutes default
+
+    if (!query || query.trim() === "") {
+      return (ctx.body = {
+        error: "Search query is required",
+      });
+    }
+
+    const searchResults = await logStorage.searchLogs(appName, query, {
+      logType: logType || null,
+      hours: parseFloat(hours),
+      limit: parseInt(limit),
+    });
+
+    // Convert stored logs to display format
+    const formattedResults = searchResults.map((log) => ({
+      timestamp: new Date(log.timestamp).toLocaleString(),
+      level: log.parsed.level,
+      message: log.parsed.message,
+      jsonData: log.parsed.jsonData,
+      raw: log.raw,
+      logType: log.logType,
+    }));
+
+    return (ctx.body = {
+      success: true,
+      query,
+      totalResults: formattedResults.length,
+      results: formattedResults,
+    });
+  } catch (err) {
+    console.error("Search error:", err);
+    return (ctx.body = {
+      error: "Search failed: " + err.message,
+    });
+  }
+});
+
+// Get recent logs endpoint
+router.get("/api/apps/:appName/logs/recent", isAuthenticated, async (ctx) => {
+  try {
+    const { appName } = ctx.params;
+    const { logType, hours = 0.5, limit = 50 } = ctx.query; // 30 minutes default
+
+    const recentLogs = await logStorage.getRecentLogs(appName, logType, {
+      hours: parseFloat(hours),
+      limit: parseInt(limit),
+    });
+
+    const formattedLogs = recentLogs.map((log) => ({
+      timestamp: new Date(log.timestamp).toLocaleString(),
+      level: log.parsed.level,
+      message: log.parsed.message,
+      jsonData: log.parsed.jsonData,
+      raw: log.raw,
+      logType: log.logType,
+    }));
+
+    return (ctx.body = {
+      success: true,
+      totalLogs: formattedLogs.length,
+      logs: formattedLogs,
+    });
+  } catch (err) {
+    console.error("Recent logs error:", err);
+    return (ctx.body = {
+      error: "Failed to fetch recent logs: " + err.message,
+    });
+  }
+});
+
+// Get storage statistics
+router.get("/api/logs/stats", isAuthenticated, async (ctx) => {
+  try {
+    const stats = await logStorage.getStorageStats();
+    return (ctx.body = {
+      success: true,
+      ...stats,
+    });
+  } catch (err) {
+    console.error("Storage stats error:", err);
+    return (ctx.body = {
+      error: "Failed to get storage stats: " + err.message,
+    });
+  }
+});
+
+// Download logs as text file
+router.get("/api/apps/:appName/logs/download", isAuthenticated, async (ctx) => {
+  try {
+    const { appName } = ctx.params;
+    const { hours = 0.5 } = ctx.query; // 30 minutes default
+
+    const logs = await logStorage.getRecentLogs(appName, "stdout", {
+      hours: parseFloat(hours),
+      limit: 10000, // High limit for download
+    });
+
+    if (logs.length === 0) {
+      return (ctx.body = {
+        error: "No logs available for download",
+      });
+    }
+
+    // Format logs as text
+    const logText = logs
+      .map((log) => {
+        const timestamp = new Date(log.timestamp).toISOString();
+        const jsonPart = log.parsed.jsonData
+          ? ` | ${JSON.stringify(log.parsed.jsonData)}`
+          : "";
+        return `[${timestamp}] ${log.parsed.level.toUpperCase()} :: ${
+          log.parsed.message
+        }${jsonPart}`;
+      })
+      .join("\n");
+
+    // Set headers for file download
+    const filename = `${appName}_logs_${new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace(/:/g, "-")}.txt`;
+    ctx.set("Content-Type", "text/plain");
+    ctx.set("Content-Disposition", `attachment; filename="${filename}"`);
+
+    return (ctx.body = logText);
+  } catch (err) {
+    console.error("Download error:", err);
+    return (ctx.body = {
+      error: "Failed to download logs: " + err.message,
+    });
+  }
+});
+
+// Legacy endpoint - placed last to avoid route conflicts
+// This endpoint reads from log files directly (old system)
+router.get("/api/apps/:appName/logs/:logType", isAuthenticated, async (ctx) => {
+  const { appName, logType } = ctx.params;
+  const { linePerRequest, nextKey } = ctx.query;
+  if (logType !== "stdout") {
+    return (ctx.body = {
+      error: "Log Type must be stdout (stderr is no longer supported)",
+    });
+  }
+  const app = await describeApp(appName);
+  const filePath =
+    logType === "stdout" ? app.pm_out_log_path : app.pm_err_log_path;
+  let logs = await readLogsReverse({ filePath, nextKey });
+  logs.lines = logs.lines
+    .map((log) => {
+      return ansiConvert.toHtml(log);
+    })
+    .join("<br/>");
+  return (ctx.body = {
+    logs,
+  });
 });
 
 module.exports = router;

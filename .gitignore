@@ -120,3 +120,6 @@ dist
 
 # Temp Folder
 .tmp
+
+#logs storage directory
+logs-storage
